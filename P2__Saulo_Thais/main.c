@@ -7,9 +7,9 @@
 #include <locale.h>
 
 // Struct para armazenar os dados de cada vendedor
-struct Vendedor {
-  char codigo[20];
-  char nome[50];
+struct Venda {
+  char codigoVendedor[20];
+  char nomeVendedor[50];
   float valorVenda;
   int mes;
   int ano;
@@ -27,7 +27,75 @@ void criarArquivo() {
   fclose(fp);
 }
 
+// Função para ler os dados da struct do usuário
+struct Venda recebeRegistro() {
+  struct Venda registro;
+
+  printf("Digite o código do vendedor: ");
+  scanf("%s", registro.codigoVendedor);
+
+  printf("Digite o nome do vendedor: ");
+  scanf("%s", registro.nomeVendedor);
+
+  printf("Digite o valor da venda: ");
+  scanf("%lf", &registro.valorVenda);
+
+  printf("Digite o mês da venda: ");
+  scanf("%d", &registro.mes);
+
+  printf("Digite o ano da venda: ");
+  scanf("%d", &registro.ano);
+
+  return registro;
+}
+
+// Função de comparação para ordenar os registros pelo código do vendedor e mês/ano
+int compararRegistros(const void *a, const void *b) {
+  struct Venda *registroA = (struct Venda *) a;
+  struct Venda *registroB = (struct Venda *) b;
+  int codVendedor = strcmp(registroA->codigoVendedor, registroB->codigoVendedor);
+  if (codVendedor != 0) {
+    return codVendedor;
+  }
+  if (registroA->ano != registroB->ano) {
+    return registroA->ano - registroB->ano;
+  }
+  return registroA->mes - registroB->mes;
+}
+
+// Função para incluir um registro no arquivo
 void incluirRegistro() {
+  // Abre o arquivo em modo de leitura binária
+  FILE *fp;
+  fp = fopen("vendas.txt", "rb");
+  if (fp == NULL) {
+    printf("Erro ao abrir o arquivo de dados.\n");
+    return;
+  }
+  // Lê todos os registros do arquivo e os armazena em um vetor
+  struct Venda registros[100];
+  int numRegistros = 0;
+  while (fread(&registros[numRegistros], sizeof(struct Venda), 1, fp)) {
+    numRegistros++;
+  }
+  fclose(fp);
+  // Adiciona o novo registro no vetor
+  registros[numRegistros] = recebeRegistro();
+  numRegistros++;
+  // Ordena o vetor de registros
+  qsort(registros, numRegistros, sizeof(struct Venda), compararRegistros);
+  // Abre o arquivo em modo de escrita binária
+  fp = fopen("vendas.txt", "wb");
+  if (fp == NULL) {
+    printf("Erro ao abrir o arquivo de dados.\n");
+    return;
+  }
+  // Escreve os registros ordenados no arquivo
+  for (int i = 0; i < numRegistros; i++) {
+    fwrite(&registros[i], sizeof(struct Venda), 1, fp);
+  }
+  printf("Registro incluído com sucesso.\n");
+  fclose(fp);
 }
 
 void excluirVendedor() {
@@ -63,8 +131,8 @@ int main() {
   while (1) {
 
     // Menu de opções
-    printf("\n\n--------------------------------------------------------------------------------");
-    printf("\nSelecione uma opção:\n",setlocale(LC_ALL,""));
+    printf("\n\n--------------------------------------------------------------------------------\n\n");
+    printf("Selecione uma opção:\n",setlocale(LC_ALL,""));
     printf("1 - Criar o arquivo de dados\n");
     printf("2 - Incluir um determinado registro no arquivo\n");
     printf("3 - Excluir um determinado vendedor no arquivo\n");
