@@ -115,9 +115,12 @@ void imprimirRegistros() {
 }
 
 void excluirArquivo() {
-}
-
-void finalizarPrograma() {
+  // Remove o arquivo
+  if (remove("vendas.dat") == 0) {
+    printf("Arquivo excluido com sucesso.\n");
+  } else {
+    printf("Erro ao excluir o arquivo.\n");
+  }
 }
 
 int main() {
