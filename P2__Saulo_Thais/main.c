@@ -10,7 +10,7 @@
 struct Venda {
   char codigoVendedor[20];
   char nomeVendedor[50];
-  float valorVenda;
+  double valorVenda;
   int mes;
   int ano;
 };
@@ -49,46 +49,44 @@ struct Venda recebeRegistro() {
   return registro;
 }
 
-// Função de comparação para ordenar os registros pelo código do vendedor e mês/ano
-int compararRegistros(const void *a, const void *b) {
-  struct Venda *registroA = (struct Venda *) a;
-  struct Venda *registroB = (struct Venda *) b;
-  int codVendedor = strcmp(registroA->codigoVendedor, registroB->codigoVendedor);
-  if (codVendedor != 0) {
-    return codVendedor;
-  }
-  if (registroA->ano != registroB->ano) {
-    return registroA->ano - registroB->ano;
-  }
-  return registroA->mes - registroB->mes;
-}
-
 // Função para incluir um registro no arquivo
 void incluirRegistro() {
   FILE *fp;
-  fp = fopen("vendas.dat", "a");
+  fp = fopen("vendas.dat", "ab");
   if (fp == NULL) {
     printf("Erro ao abrir o arquivo de dados.\n");
-  } 
-  else {
-    // Procura a posição correta para inserir o novo registro
-    struct Venda currRecord;
+  } else {
     struct Venda registro = recebeRegistro();
+    // Verifica se já existe um registro com o mesmo código de vendedor
     int found = 0;
-    while (fscanf(fp, "%s %s %lf %d %d", currRecord.codigoVendedor, currRecord.nomeVendedor, &currRecord.valorVenda, &currRecord.mes, &currRecord.ano) == 5) {
-      if (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) < 0 || (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) == 0 && registro.ano < currRecord.ano) || (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) == 0 && registro.ano == currRecord.ano && registro.mes < currRecord.mes)) {
+    struct Venda r;
+    fseek(fp, 0, SEEK_SET);
+    while (fread(&r, sizeof(struct Venda), 1, fp)) {
+      if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0) {
         found = 1;
         break;
       }
     }
     if (found) {
-      // Insere o novo registro na posição encontrada
-      fprintf(fp, "\n%s %s %.2lf %d %d", registro.codigoVendedor, registro.nomeVendedor, registro.valorVenda, registro.mes, registro.ano);
+      printf("Já existe um vendedor com este código.\n");
     } else {
-      // Insere o novo registro no final do arquivo
-      fprintf(fp, "\n%s %s %.2lf %d %d", registro.codigoVendedor, registro.nomeVendedor, registro.valorVenda, registro.mes, registro.ano);
+      // Verifica onde o novo registro deve ser inserido
+      fseek(fp, 0, SEEK_END);
+      long pos = ftell(fp);
+      fseek(fp, 0, SEEK_SET);
+      while (fread(&r, sizeof(struct Venda), 1, fp)) {
+        if (strcmp(r.codigoVendedor, registro.codigoVendedor) > 0 ||
+            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano > registro.ano) ||
+            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano == registro.ano && r.mes > registro.mes)) {
+          pos = ftell(fp) - sizeof(struct Venda);
+          break;
+        }
+      }
+      // Insere o novo registro na posição encontrada
+      fseek(fp, pos, SEEK_SET);
+      fwrite(&registro, sizeof(struct Venda), 1, fp);
+      printf("Registro incluido com sucesso.\n");
     }
-    printf("Registro incluído com sucesso.\n");
   }
   fclose(fp);
 }
@@ -112,6 +110,23 @@ void somatorioVendasAno() {
 }
 
 void imprimirRegistros() {
+  // Abre o arquivo em modo de leitura binária
+  FILE *fp;
+  fp = fopen("vendas.dat", "rb");
+  if (fp == NULL) {
+    printf("Erro ao abrir o arquivo de dados.\n");
+  } else {
+    struct Venda registro;
+    // Lê cada registro do arquivo e exibe na tela
+    while (fread(&registro, sizeof(struct Venda), 1, fp)) {
+      printf("Codigo do vendedor: %s\n", registro.codigoVendedor);
+      printf("Nome do vendedor: %s\n", registro.nomeVendedor);
+      printf("Valor da venda: %.2f\n", registro.valorVenda);
+      printf("Mes/Ano: %d/%d\n", registro.mes, registro.ano);
+      printf("\n");
+    }
+  }
+  fclose(fp);
 }
 
 void excluirArquivo() {
