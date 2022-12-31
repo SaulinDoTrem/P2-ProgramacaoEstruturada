@@ -1,5 +1,5 @@
-//Projeto para P2 De ProgramaÁ„o Estrutura
-// Feito por Saulo Klein e ThaÌs Munier
+//Projeto para P2 De Programa√ß√£o Estrutura
+// Feito por Saulo Klein e Tha√≠s Munier
 
 #include <stdio.h>
 #include <string.h>
@@ -15,10 +15,10 @@ struct Venda {
   int ano;
 };
 
-// FunÁ„o para criar o arquivo de dados
+// Fun√ß√£o para criar o arquivo de dados
 void criarArquivo() {
   FILE *fp;
-  fp = fopen("vendas.txt", "wb");
+  fp = fopen("vendas.dat", "w");
   if (fp == NULL) {
     printf("Erro ao criar o arquivo de dados.\n");
   } else {
@@ -27,11 +27,11 @@ void criarArquivo() {
   fclose(fp);
 }
 
-// FunÁ„o para ler os dados da struct do usu·rio
+// Fun√ß√£o para ler os dados da struct do usu√°rio
 struct Venda recebeRegistro() {
   struct Venda registro;
 
-  printf("Digite o cÛdigo do vendedor: ");
+  printf("Digite o codigo do vendedor: ");
   scanf("%s", registro.codigoVendedor);
 
   printf("Digite o nome do vendedor: ");
@@ -40,7 +40,7 @@ struct Venda recebeRegistro() {
   printf("Digite o valor da venda: ");
   scanf("%lf", &registro.valorVenda);
 
-  printf("Digite o mÍs da venda: ");
+  printf("Digite o mes da venda: ");
   scanf("%d", &registro.mes);
 
   printf("Digite o ano da venda: ");
@@ -49,7 +49,7 @@ struct Venda recebeRegistro() {
   return registro;
 }
 
-// FunÁ„o de comparaÁ„o para ordenar os registros pelo cÛdigo do vendedor e mÍs/ano
+// Fun√ß√£o de compara√ß√£o para ordenar os registros pelo c√≥digo do vendedor e m√™s/ano
 int compararRegistros(const void *a, const void *b) {
   struct Venda *registroA = (struct Venda *) a;
   struct Venda *registroB = (struct Venda *) b;
@@ -63,38 +63,33 @@ int compararRegistros(const void *a, const void *b) {
   return registroA->mes - registroB->mes;
 }
 
-// FunÁ„o para incluir um registro no arquivo
+// Fun√ß√£o para incluir um registro no arquivo
 void incluirRegistro() {
-  // Abre o arquivo em modo de leitura bin·ria
   FILE *fp;
-  fp = fopen("vendas.txt", "rb");
+  fp = fopen("vendas.dat", "a");
   if (fp == NULL) {
     printf("Erro ao abrir o arquivo de dados.\n");
-    return;
+  } 
+  else {
+    // Procura a posi√ß√£o correta para inserir o novo registro
+    struct Venda currRecord;
+    struct Venda registro = recebeRegistro();
+    int found = 0;
+    while (fscanf(fp, "%s %s %lf %d %d", currRecord.codigoVendedor, currRecord.nomeVendedor, &currRecord.valorVenda, &currRecord.mes, &currRecord.ano) == 5) {
+      if (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) < 0 || (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) == 0 && registro.ano < currRecord.ano) || (strcmp(registro.codigoVendedor, currRecord.codigoVendedor) == 0 && registro.ano == currRecord.ano && registro.mes < currRecord.mes)) {
+        found = 1;
+        break;
+      }
+    }
+    if (found) {
+      // Insere o novo registro na posi√ß√£o encontrada
+      fprintf(fp, "\n%s %s %.2lf %d %d", registro.codigoVendedor, registro.nomeVendedor, registro.valorVenda, registro.mes, registro.ano);
+    } else {
+      // Insere o novo registro no final do arquivo
+      fprintf(fp, "\n%s %s %.2lf %d %d", registro.codigoVendedor, registro.nomeVendedor, registro.valorVenda, registro.mes, registro.ano);
+    }
+    printf("Registro inclu√≠do com sucesso.\n");
   }
-  // LÍ todos os registros do arquivo e os armazena em um vetor
-  struct Venda registros[100];
-  int numRegistros = 0;
-  while (fread(&registros[numRegistros], sizeof(struct Venda), 1, fp)) {
-    numRegistros++;
-  }
-  fclose(fp);
-  // Adiciona o novo registro no vetor
-  registros[numRegistros] = recebeRegistro();
-  numRegistros++;
-  // Ordena o vetor de registros
-  qsort(registros, numRegistros, sizeof(struct Venda), compararRegistros);
-  // Abre o arquivo em modo de escrita bin·ria
-  fp = fopen("vendas.txt", "wb");
-  if (fp == NULL) {
-    printf("Erro ao abrir o arquivo de dados.\n");
-    return;
-  }
-  // Escreve os registros ordenados no arquivo
-  for (int i = 0; i < numRegistros; i++) {
-    fwrite(&registros[i], sizeof(struct Venda), 1, fp);
-  }
-  printf("Registro incluÌdo com sucesso.\n");
   fclose(fp);
 }
 
@@ -130,24 +125,24 @@ int main() {
 
   while (1) {
 
-    // Menu de opÁıes
+    // Menu de opcoes
     printf("\n\n--------------------------------------------------------------------------------\n\n");
-    printf("Selecione uma opÁ„o:\n",setlocale(LC_ALL,""));
+    printf("Selecione uma opcao:\n");
     printf("1 - Criar o arquivo de dados\n");
     printf("2 - Incluir um determinado registro no arquivo\n");
     printf("3 - Excluir um determinado vendedor no arquivo\n");
     printf("4 - Alterar o valor de uma venda no arquivo\n");
     printf("5 - Consultar a maior valor de venda registrado\n");
-    printf("6 - Consultar o maior valor de venda registrado para um determinado mÍs/ano\n");
-    printf("7 - Imprimir o somatÛrio das vendas de um determinado mÍs/ano\n");
-    printf("8 - Imprimir o somatÛrio das vendas de um determinado ano\n");
-    printf("9 - Imprimir os registros na saÌda padr„o\n");
+    printf("6 - Consultar o maior valor de venda registrado para um determinado mes/ano\n");
+    printf("7 - Imprimir o somatario das vendas de um determinado mes/ano\n");
+    printf("8 - Imprimir o somatario das vendas de um determinado ano\n");
+    printf("9 - Imprimir os registros na saida padrao\n");
     printf("10 - Excluir o arquivo de dados\n");
     printf("11 - Finalizar o programa\n\n");
     scanf("%d", &opcao);
     printf("\n--------------------------------------------------------------------------------\n\n");
 
-    // Executar a opÁ„o escolhida pelo usu·rio
+    // Executar a opcao escolhida pelo usuario
     switch (opcao) {
       case 1:
         criarArquivo();
@@ -182,7 +177,7 @@ int main() {
       case 11:
         return 0;
       default:
-        printf("OpÁ„o Inv·lida");
+        printf("Opcao Invalida");
         break;
     }
   }
