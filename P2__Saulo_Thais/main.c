@@ -1,5 +1,5 @@
-//Projeto para P2 De Programação Estrutura
-// Feito por Saulo Klein e Thaís Munier
+// Projeto para P2 De Programação Estrutura
+//  Feito por Saulo Klein e Thaís Munier
 
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +7,8 @@
 #include <locale.h>
 
 // Struct para armazenar os dados de cada vendedor
-struct Venda {
+struct Venda
+{
   char codigoVendedor[20];
   char nomeVendedor[50];
   double valorVenda;
@@ -16,19 +17,24 @@ struct Venda {
 };
 
 // Função para criar o arquivo de dados
-void criarArquivo() {
+void criarArquivo()
+{
   FILE *fp;
   fp = fopen("vendas.dat", "w");
-  if (fp == NULL) {
+  if (fp == NULL)
+  {
     printf("Erro ao criar o arquivo de dados.\n");
-  } else {
+  }
+  else
+  {
     printf("Arquivo de dados criado com sucesso.\n");
   }
   fclose(fp);
 }
 
 // Função para ler os dados da struct do usuário
-struct Venda recebeRegistro() {
+struct Venda recebeRegistro()
+{
   struct Venda registro;
 
   printf("Digite o codigo do vendedor: ");
@@ -50,34 +56,45 @@ struct Venda recebeRegistro() {
 }
 
 // Função para incluir um registro no arquivo
-void incluirRegistro() {
+void incluirRegistro()
+{
   FILE *fp;
   fp = fopen("vendas.dat", "ab");
-  if (fp == NULL) {
+  if (fp == NULL)
+  {
     printf("Erro ao abrir o arquivo de dados.\n");
-  } else {
+  }
+  else
+  {
     struct Venda registro = recebeRegistro();
     // Verifica se já existe um registro com o mesmo código de vendedor
     int found = 0;
     struct Venda r;
     fseek(fp, 0, SEEK_SET);
-    while (fread(&r, sizeof(struct Venda), 1, fp)) {
-      if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0) {
+    while (fread(&r, sizeof(struct Venda), 1, fp))
+    {
+      if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0)
+      {
         found = 1;
         break;
       }
     }
-    if (found) {
+    if (found)
+    {
       printf("Já existe um vendedor com este código.\n");
-    } else {
+    }
+    else
+    {
       // Verifica onde o novo registro deve ser inserido
       fseek(fp, 0, SEEK_END);
       long pos = ftell(fp);
       fseek(fp, 0, SEEK_SET);
-      while (fread(&r, sizeof(struct Venda), 1, fp)) {
+      while (fread(&r, sizeof(struct Venda), 1, fp))
+      {
         if (strcmp(r.codigoVendedor, registro.codigoVendedor) > 0 ||
             (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano > registro.ano) ||
-            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano == registro.ano && r.mes > registro.mes)) {
+            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano == registro.ano && r.mes > registro.mes))
+        {
           pos = ftell(fp) - sizeof(struct Venda);
           break;
         }
@@ -91,37 +108,76 @@ void incluirRegistro() {
   fclose(fp);
 }
 
-void excluirVendedor() {
+void excluirVendedor()
+{
 }
 
-void alterarValorVenda() {
+void alterarValorVenda()
+{
 }
 
-void consultarMaiorVenda() {
+void consultarMaiorVenda()
+{
 }
 
-void consultarMaiorVendaMesAno() {
+void consultarMaiorVendaMesAno()
+{
 }
 
-void somatorioVendasMesAno() {
+void somatorioVendasMesAno()
+{
 }
 
-void somatorioVendasAno() {
-}
-
-void imprimirRegistros() {
+void somatorioVendasAno()
+{
   // Abre o arquivo em modo de leitura binária
   FILE *fp;
   fp = fopen("vendas.dat", "rb");
-  if (fp == NULL) {
+  if (fp == NULL)
+  {
     printf("Erro ao abrir o arquivo de dados.\n");
-  } else {
+    return;
+  }
+  else
+  {
+    double total = 0;
+    int ano = 0;
+
+    // Recebe o ano desejado para a consulta
+    printf("Digite o ano que deseja realizar o somatorio: ");
+    scanf("%d", &ano);
+    
+    struct Venda registro;
+    while (fread(&registro, sizeof(struct Venda), 1, fp))
+    {
+      if (registro.ano == ano)
+      {
+        total += registro.valorVenda;
+      }
+    }
+    printf("\nSomatorio das vendas do ano %d: %.2lf\n", ano, total);
+  }
+  fclose(fp);
+}
+
+void imprimirRegistros()
+{
+  // Abre o arquivo em modo de leitura binária
+  FILE *fp;
+  fp = fopen("vendas.dat", "rb");
+  if (fp == NULL)
+  {
+    printf("Erro ao abrir o arquivo de dados.\n");
+  }
+  else
+  {
     struct Venda registro;
     // Lê cada registro do arquivo e exibe na tela
-    while (fread(&registro, sizeof(struct Venda), 1, fp)) {
+    while (fread(&registro, sizeof(struct Venda), 1, fp))
+    {
       printf("Codigo do vendedor: %s\n", registro.codigoVendedor);
       printf("Nome do vendedor: %s\n", registro.nomeVendedor);
-      printf("Valor da venda: %.2f\n", registro.valorVenda);
+      printf("Valor da venda: R$ %.2f\n", registro.valorVenda);
       printf("Mes/Ano: %d/%d\n", registro.mes, registro.ano);
       printf("\n");
     }
@@ -129,19 +185,25 @@ void imprimirRegistros() {
   fclose(fp);
 }
 
-void excluirArquivo() {
+void excluirArquivo()
+{
   // Remove o arquivo
-  if (remove("vendas.dat") == 0) {
+  if (remove("vendas.dat") == 0)
+  {
     printf("Arquivo excluido com sucesso.\n");
-  } else {
+  }
+  else
+  {
     printf("Erro ao excluir o arquivo.\n");
   }
 }
 
-int main() {
+int main()
+{
   int opcao;
 
-  while (1) {
+  while (1)
+  {
 
     // Menu de opcoes
     printf("\n\n--------------------------------------------------------------------------------\n\n");
@@ -161,45 +223,45 @@ int main() {
     printf("\n--------------------------------------------------------------------------------\n\n");
 
     // Executar a opcao escolhida pelo usuario
-    switch (opcao) {
-      case 1:
-        criarArquivo();
-        break;
-      case 2:
-        incluirRegistro();
-        break;
-      case 3:
-        excluirVendedor();
-        break;
-      case 4:
-        alterarValorVenda();
-        break;
-      case 5:
-        consultarMaiorVenda();
-        break;
-      case 6:
-        consultarMaiorVendaMesAno();
-        break;
-      case 7:
-        somatorioVendasMesAno();
-        break;
-      case 8:
-        somatorioVendasAno();
-        break;
-      case 9:
-        imprimirRegistros();
-        break;
-      case 10:
-        excluirArquivo();
-        break;
-      case 11:
-        return 0;
-      default:
-        printf("Opcao Invalida");
-        break;
+    switch (opcao)
+    {
+    case 1:
+      criarArquivo();
+      break;
+    case 2:
+      incluirRegistro();
+      break;
+    case 3:
+      excluirVendedor();
+      break;
+    case 4:
+      alterarValorVenda();
+      break;
+    case 5:
+      consultarMaiorVenda();
+      break;
+    case 6:
+      consultarMaiorVendaMesAno();
+      break;
+    case 7:
+      somatorioVendasMesAno();
+      break;
+    case 8:
+      somatorioVendasAno();
+      break;
+    case 9:
+      imprimirRegistros();
+      break;
+    case 10:
+      excluirArquivo();
+      break;
+    case 11:
+      return 0;
+    default:
+      printf("Opcao Invalida");
+      break;
     }
   }
 
   return 0;
 }
-
