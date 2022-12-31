@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1672355763 source:c:\users\thais\onedrive - cefet-rj.br\graduação\programacaoestruturada\p2-programacaoestruturada\p2__saulo_thais\main.c
-	<stdio.h>
-	<string.h>
-	<stdlib.h>
-	<locale.h>
-
