@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <locale.h>
 
-// Struct para armazenar os dados de cada vendedor
 struct Venda
 {
   char codigoVendedor[20];
@@ -16,7 +15,6 @@ struct Venda
   int ano;
 };
 
-// Função para criar o arquivo de dados
 void criarArquivo()
 {
   FILE *fp;
@@ -32,7 +30,6 @@ void criarArquivo()
   fclose(fp);
 }
 
-// Função para ler os dados da struct do usuário
 struct Venda recebeRegistro()
 {
   struct Venda registro;
@@ -55,7 +52,6 @@ struct Venda recebeRegistro()
   return registro;
 }
 
-// Função para incluir um registro no arquivo
 void incluirRegistro()
 {
   FILE *fp;
@@ -67,7 +63,6 @@ void incluirRegistro()
   else
   {
     struct Venda registro = recebeRegistro();
-    // Verifica se já existe um registro com o mesmo código de vendedor
     int found = 0;
     struct Venda r;
     fseek(fp, 0, SEEK_SET);
@@ -85,7 +80,6 @@ void incluirRegistro()
     }
     else
     {
-      // Verifica onde o novo registro deve ser inserido
       fseek(fp, 0, SEEK_END);
       long pos = ftell(fp);
       fseek(fp, 0, SEEK_SET);
@@ -99,7 +93,6 @@ void incluirRegistro()
           break;
         }
       }
-      // Insere o novo registro na posição encontrada
       fseek(fp, pos, SEEK_SET);
       fwrite(&registro, sizeof(struct Venda), 1, fp);
       printf("Registro incluido com sucesso.\n");
@@ -126,11 +119,37 @@ void consultarMaiorVendaMesAno()
 
 void somatorioVendasMesAno()
 {
+  FILE *fp;
+  fp = fopen("vendas.dat", "rb");
+  if (fp == NULL)
+  {
+    printf("Erro ao abrir o arquivo de dados.\n");
+  }
+  else
+  {
+    double total = 0;
+    int ano, mes;
+
+    printf("Digite o mes que deseja realizar o somatorio: ");
+    scanf("%d", &mes);
+    printf("Digite o ano que deseja realizar o somatorio: ");
+    scanf("%d", &ano);
+
+    struct Venda registro;
+    while (fread(&registro, sizeof(struct Venda), 1, fp))
+    {
+      if (registro.mes == mes && registro.ano == ano)
+      {
+        total += registro.valorVenda;
+      }
+    }
+    printf("Somatorio das vendas de %d/%d: %.2lf\n", mes, ano, total);
+  }
+  fclose(fp);
 }
 
 void somatorioVendasAno()
 {
-  // Abre o arquivo em modo de leitura binária
   FILE *fp;
   fp = fopen("vendas.dat", "rb");
   if (fp == NULL)
@@ -141,12 +160,11 @@ void somatorioVendasAno()
   else
   {
     double total = 0;
-    int ano = 0;
+    int ano;
 
-    // Recebe o ano desejado para a consulta
     printf("Digite o ano que deseja realizar o somatorio: ");
     scanf("%d", &ano);
-    
+
     struct Venda registro;
     while (fread(&registro, sizeof(struct Venda), 1, fp))
     {
@@ -162,7 +180,6 @@ void somatorioVendasAno()
 
 void imprimirRegistros()
 {
-  // Abre o arquivo em modo de leitura binária
   FILE *fp;
   fp = fopen("vendas.dat", "rb");
   if (fp == NULL)
@@ -172,7 +189,6 @@ void imprimirRegistros()
   else
   {
     struct Venda registro;
-    // Lê cada registro do arquivo e exibe na tela
     while (fread(&registro, sizeof(struct Venda), 1, fp))
     {
       printf("Codigo do vendedor: %s\n", registro.codigoVendedor);
@@ -187,7 +203,6 @@ void imprimirRegistros()
 
 void excluirArquivo()
 {
-  // Remove o arquivo
   if (remove("vendas.dat") == 0)
   {
     printf("Arquivo excluido com sucesso.\n");
@@ -205,7 +220,6 @@ int main()
   while (1)
   {
 
-    // Menu de opcoes
     printf("\n\n--------------------------------------------------------------------------------\n\n");
     printf("Selecione uma opcao:\n");
     printf("1 - Criar o arquivo de dados\n");
@@ -222,7 +236,6 @@ int main()
     scanf("%d", &opcao);
     printf("\n--------------------------------------------------------------------------------\n\n");
 
-    // Executar a opcao escolhida pelo usuario
     switch (opcao)
     {
     case 1:
