@@ -6,10 +6,13 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#define MAX_CODE_LEN 10
+#define MAX_NAME_LEN 50
+
 struct Venda
 {
-  char codigoVendedor[20];
-  char nomeVendedor[50];
+  char codigoVendedor[MAX_CODE_LEN];
+  char nomeVendedor[MAX_NAME_LEN];
   double valorVenda;
   int mes;
   int ano;
@@ -115,6 +118,43 @@ void consultarMaiorVenda()
 
 void consultarMaiorVendaMesAno()
 {
+  FILE *fp;
+  fp = fopen("vendas.dat", "rb");
+  if (fp == NULL)
+  {
+    printf("Erro ao abrir o arquivo de dados.\n");
+  }
+  else
+  {
+    int mes, ano;
+    printf("Informe o mes: ");
+    scanf("%d", &mes);
+    printf("Informe o ano: ");
+    scanf("%d", &ano);
+
+    struct Venda registro;
+    double maxVenda = 0.0;
+    char maxVendedor[MAX_NAME_LEN];
+    int found = 0;
+    while (fread(&registro, sizeof(struct Venda), 1, fp))
+    {
+      if (registro.mes == mes && registro.ano == ano && registro.valorVenda > maxVenda)
+      {
+        maxVenda = registro.valorVenda;
+        strcpy(maxVendedor, registro.nomeVendedor);
+        found = 1;
+      }
+    }
+    if (found)
+    {
+      printf("O maior valor de venda para o mes %d/%d foi de R$%.2lf, realizado pelo vendedor %s.\n", mes, ano, maxVenda, maxVendedor);
+    }
+    else
+    {
+      printf("Nao foi encontrado nenhum registro para o mes %d/%d.\n", mes, ano);
+    }
+  }
+  fclose(fp);
 }
 
 void somatorioVendasMesAno()
@@ -128,11 +168,10 @@ void somatorioVendasMesAno()
   else
   {
     double total = 0;
-    int ano, mes;
-
-    printf("Digite o mes que deseja realizar o somatorio: ");
+    int mes, ano;
+    printf("Informe o mes: ");
     scanf("%d", &mes);
-    printf("Digite o ano que deseja realizar o somatorio: ");
+    printf("Informe o ano: ");
     scanf("%d", &ano);
 
     struct Venda registro;
@@ -161,8 +200,7 @@ void somatorioVendasAno()
   {
     double total = 0;
     int ano;
-
-    printf("Digite o ano que deseja realizar o somatorio: ");
+    printf("Informe o ano: ");
     scanf("%d", &ano);
 
     struct Venda registro;
