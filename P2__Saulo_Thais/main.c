@@ -58,14 +58,14 @@ struct Venda recebeRegistro()
 
 void incluirRegistro()
 {
+  int found = 0;
   FILE *fp;
   fp = fopen(FILE_NAME, "r+b");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
   }
-  else
-  {
+  else {
     struct Venda registro = recebeRegistro();
     struct Venda r;
     fseek(fp, 0, SEEK_SET);
@@ -73,39 +73,62 @@ void incluirRegistro()
     {
       if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && strcmp(r.nomeVendedor, registro.nomeVendedor) != 0)
       {
-        printf("Ja existe um vendedor com este codigo.\n");
-        return;
+        found = 1;
+        break;
       }
     }
-      fseek(fp, 0, SEEK_END);
-      long pos = ftell(fp);
-      fseek(fp, 0, SEEK_SET);
-      while (fread(&r, sizeof(struct Venda), 1, fp))
-      {
-        if (strcmp(r.codigoVendedor, registro.codigoVendedor) > 0 ||
-            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano > registro.ano) ||
-            (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && r.ano == registro.ano && r.mes > registro.mes))
-        {
-          pos = ftell(fp) - sizeof(struct Venda);
-          break;
-        }
-      }
-      fseek(fp, pos, SEEK_SET);
+    if(found == 1) {
+        printf("Ja existe um vendedor com este codigo.\n");
+    }
+    else {
       fwrite(&registro, sizeof(struct Venda), 1, fp);
       printf("Registro incluido com sucesso.\n");
     }
+  }
+      
   fclose(fp);
 }
 
 void excluirVendedor()
 {
-  FILE *fp;
+  FILE *fp = fopen(FILE_NAME, "r+b");
+
+  if (fp == NULL) {
+    printf("Erro ao abir o arquivo de dados.\n");
+    return;
+  }
+
+  FILE *fpCopy = fopen("vendas-copy.dat", "wb");
+
+  struct Venda registro;
+  char codigo[MAX_CODE_LEN];
+  int counter = 0;
+  int found = 0;
+
+  printf("Digite o codigo do vendedor que deseja excluir do arquivo\nObs: Todos os registros que possuem esse vendedor serao apagados tambem:");
+  scanf("%s", codigo);
+
+  while(fread(&registro, sizeof(struct Venda), 1, fp)) {
+    if(strcmp(registro.codigoVendedor, codigo) == 0) {
+      found = 1;
+      counter++;
+    }
+    else fwrite(&registro, sizeof(struct Venda), 1, fpCopy);
+  }
+
+  if(found == 1) {
+    printf("O vendedor foi excluído com sucesso, %d registros foram afetados.\n", counter);
+  }
+
+  fclose(fp);
+  fclose(fpCopy);
+  remove(FILE_NAME);
+  rename("vendas-copy.dat", FILE_NAME);
 }
 
 void alterarValorVenda()
 {
-  FILE *fp;
-  fp = fopen(FILE_NAME, "r+b");
+  FILE *fp = fopen(FILE_NAME, "r+b");
 
   if (fp == NULL) {
     printf("Erro ao abir o arquivo de dados.\n");
