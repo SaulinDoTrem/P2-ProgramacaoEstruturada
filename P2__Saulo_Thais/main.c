@@ -110,10 +110,39 @@ void excluirVendedor()
 
 void alterarValorVenda()
 {
+  
 }
 
 void consultarMaiorVenda()
 {
+  FILE *fp;
+  fp = fopen("vendas.dat", "rb");
+
+  if (fp == NULL){
+    printf("Erro ao abir o arquivo de dados.\n");
+    return;
+  }
+
+  struct Venda registro;
+  double maxVenda = 0.0;
+  char maxVendedor[MAX_NAME_LEN];
+  int found = 0;
+  
+  while(fread(&registro, sizeof(struct Venda), 1, fp)){
+    if(registro.valorVenda > maxVenda){
+      maxVenda = registro.valorVenda;
+      strcpy(maxVendedor, registro.nomeVendedor);
+      found = 1;
+    }
+  }
+
+  if(found) 
+    printf("O maior valor de venda foi de R$%.2lf, realizado pelo vendedor %s.\n", maxVenda, maxVendedor);
+  else
+    printf("Não foi encontrado nenhum registro");
+  
+  fclose(fp);
+
 }
 
 void consultarMaiorVendaMesAno()
