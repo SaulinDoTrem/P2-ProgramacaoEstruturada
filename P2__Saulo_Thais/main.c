@@ -58,7 +58,7 @@ struct Venda recebeRegistro()
 void incluirRegistro()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "ab");
+  fp = fopen("vendas.dat", "r+b");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -66,23 +66,16 @@ void incluirRegistro()
   else
   {
     struct Venda registro = recebeRegistro();
-    int found = 0;
     struct Venda r;
     fseek(fp, 0, SEEK_SET);
     while (fread(&r, sizeof(struct Venda), 1, fp))
     {
-      if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0)
+      if (strcmp(r.codigoVendedor, registro.codigoVendedor) == 0 && strcmp(r.nomeVendedor, registro.nomeVendedor) != 0)
       {
-        found = 1;
-        break;
+        printf("Ja existe um vendedor com este codigo.\n");
+        return;
       }
     }
-    if (found)
-    {
-      printf("Já existe um vendedor com este código.\n");
-    }
-    else
-    {
       fseek(fp, 0, SEEK_END);
       long pos = ftell(fp);
       fseek(fp, 0, SEEK_SET);
@@ -100,7 +93,6 @@ void incluirRegistro()
       fwrite(&registro, sizeof(struct Venda), 1, fp);
       printf("Registro incluido com sucesso.\n");
     }
-  }
   fclose(fp);
 }
 
@@ -110,7 +102,53 @@ void excluirVendedor()
 
 void alterarValorVenda()
 {
-  
+  FILE *fp;
+  fp = fopen("vendas.dat", "r+b");
+
+  if (fp == NULL) {
+    printf("Erro ao abir o arquivo de dados.\n");
+    return;
+  }
+
+  FILE *fpCopy = fopen("vendas-copy.dat", "wb");
+
+  struct Venda registro;
+  struct Venda newRegistro;
+  double valorVenda;
+  int found = 0;
+
+
+  printf("A seguir digite os dados antigos da venda realizada que deseja alterar:\n");
+  printf("Digite o codigo do vendedor:");
+  scanf("%s", newRegistro.codigoVendedor);
+  printf("Digite o nome do vendedor:");
+  scanf("%s", newRegistro.nomeVendedor);
+  printf("Digite o valor da venda:");
+  scanf("%lf", &valorVenda);
+  printf("Digite o mes:");
+  scanf("%d", &newRegistro.mes);
+  printf("Digite o ano:");
+  scanf("%d", &newRegistro.ano);
+  printf("Digite o novo valor da venda:");
+  scanf("%lf", &newRegistro.valorVenda);
+
+  while(fread(&registro, sizeof(struct Venda), 1, fp)) {
+    if(strcmp(registro.codigoVendedor, newRegistro.codigoVendedor) == 0 && registro.ano == newRegistro.ano && registro.mes == newRegistro.mes && registro.valorVenda == valorVenda) {
+      fwrite(&newRegistro, sizeof(struct Venda), 1, fpCopy);
+      printf("Registro incluido com sucesso.\n");
+      found = 1;
+    }
+    else {
+      fwrite(&registro, sizeof(struct Venda), 1, fpCopy);
+    }
+  }
+
+  if(found == 0) printf("Registro não encontrado.\n");
+
+  fclose(fp);
+  fclose(fpCopy);
+  remove("vendas.dat");
+  rename("vendas-copy.dat", "vendas.dat");
 }
 
 void consultarMaiorVenda()
