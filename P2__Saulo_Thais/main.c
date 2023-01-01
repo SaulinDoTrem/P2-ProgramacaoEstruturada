@@ -8,6 +8,7 @@
 
 #define MAX_CODE_LEN 10
 #define MAX_NAME_LEN 50
+#define FILE_NAME "vendas.dat"
 
 struct Venda
 {
@@ -21,7 +22,7 @@ struct Venda
 void criarArquivo()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "w");
+  fp = fopen(FILE_NAME, "w");
   if (fp == NULL)
   {
     printf("Erro ao criar o arquivo de dados.\n");
@@ -58,7 +59,7 @@ struct Venda recebeRegistro()
 void incluirRegistro()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "r+b");
+  fp = fopen(FILE_NAME, "r+b");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -98,12 +99,13 @@ void incluirRegistro()
 
 void excluirVendedor()
 {
+  FILE *fp;
 }
 
 void alterarValorVenda()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "r+b");
+  fp = fopen(FILE_NAME, "r+b");
 
   if (fp == NULL) {
     printf("Erro ao abir o arquivo de dados.\n");
@@ -147,14 +149,14 @@ void alterarValorVenda()
 
   fclose(fp);
   fclose(fpCopy);
-  remove("vendas.dat");
-  rename("vendas-copy.dat", "vendas.dat");
+  remove(FILE_NAME);
+  rename("vendas-copy.dat", FILE_NAME);
 }
 
 void consultarMaiorVenda()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "rb");
+  fp = fopen(FILE_NAME, "rb");
 
   if (fp == NULL){
     printf("Erro ao abir o arquivo de dados.\n");
@@ -186,7 +188,7 @@ void consultarMaiorVenda()
 void consultarMaiorVendaMesAno()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "rb");
+  fp = fopen(FILE_NAME, "rb");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -227,7 +229,7 @@ void consultarMaiorVendaMesAno()
 void somatorioVendasMesAno()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "rb");
+  fp = fopen(FILE_NAME, "rb");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -257,7 +259,7 @@ void somatorioVendasMesAno()
 void somatorioVendasAno()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "rb");
+  fp = fopen(FILE_NAME, "rb");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -286,7 +288,7 @@ void somatorioVendasAno()
 void imprimirRegistros()
 {
   FILE *fp;
-  fp = fopen("vendas.dat", "rb");
+  fp = fopen(FILE_NAME, "rb");
   if (fp == NULL)
   {
     printf("Erro ao abrir o arquivo de dados.\n");
@@ -308,7 +310,7 @@ void imprimirRegistros()
 
 void excluirArquivo()
 {
-  if (remove("vendas.dat") == 0)
+  if (remove(FILE_NAME) == 0)
   {
     printf("Arquivo excluido com sucesso.\n");
   }
